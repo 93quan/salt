@@ -1,0 +1,11 @@
+[Unit]
+Description=Start mysql
+After=network.target 
+
+[Service]
+Type=forking
+ExecStart={{ pillar['install_mysqldir'] }}/mysql/support-files/mysql.server start
+ExecStop={{ pillar['install_mysqldir'] }}/mysql/support-files/mysql.server stop
+ExecReload=/bin/kill -HUP $MAINPID 
+[Install]
+WantedBy=multi-user.target
