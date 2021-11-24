@@ -1,0 +1,11 @@
+[Unit]
+Description=Redis data structure server
+Documentation=https://redis.io/documentation
+
+[Service]
+ExecStart=/usr/local/bin/redis-server /usr/local/redis/conf --supervised systemd 
+#ExecStart=/usr/local/bin/redis-server /path/to/your/redis.conf
+Type=notify
+
+[Install]
+WantedBy=multi-user.target
