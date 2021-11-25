@@ -1,0 +1,8 @@
+#!/bin/bash
+
+cd /usr/local
+ln -sv haproxy-2.4.8 haproxy
+cd {{ pillar['haproxy_installdir'] }}
+make clean
+make -j $(grep 'processor' /proc/cpuinfo |wc -l) TARGET=linux-glibc USE_OPENSSL=1 USE_ZLIB=1 USE_PCRE=1 USE_SYSTEMD=1 && \
+make install PREFIX={{ pillar['haproxy_installdir'] }}
