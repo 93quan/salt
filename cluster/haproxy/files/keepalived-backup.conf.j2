@@ -1,0 +1,41 @@
+! Configuration File for keepalived
+
+global_defs {
+   router_id haproxy02
+}
+
+vrrp_instance VI_1 {
+    state backup
+    interface {{ pillar['haproxy_network_card'] }}
+    virtual_router_id {{ pillar['haproxy_virtual_router_id'] }}
+    priority {{ pillar['haproxy_backup_priority'] }}
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass {{ pillar['haproxy_auth_pass'] }}
+    }
+    virtual_ipaddress {
+        {{ pillar['haproxy_vip'] }}
+    }
+    notify_master "/opt/scripts/notify.sh master"
+    notify_backup "/opt/scripts/notify.sh backup"
+}
+
+virtual_server {{ pillar['haproxy_vip'] }} {{ pillar['haproxy_port'] }} {
+    delay_loop 6
+    lb_algo rr
+    lb_kind DR
+    persistence_timeout 50
+    protocol TCP
+
+{% for haproxy_ip  in pillar['haproxy_info'] %}    real_server {{ haproxy_ip }} {{ pillar['haproxy_port'] }} {
+        weight 1
+        TCP_CHECK {
+            connect_port {{ pillar['haproxy_port'] }} 
+            connect_timeout 3
+            nb_get_retry 3
+            delay_before_retry 3
+      }
+}
+{% endfor %}
+}
